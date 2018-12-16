@@ -17,6 +17,25 @@
       ...mapGetters(['fileName'])
     },
     methods: {
+      // 上一页
+      prevPage () {
+        if (this.rendition) {
+          // 翻页
+          this.rendition.prev()
+        }
+      },
+      // 下一页
+      nextPage () {
+        if (this.rendition) {
+          // 翻页
+          this.rendition.next()
+        }
+      },
+      // 显示标题菜单
+      toggleTitleAndMenu () {
+
+      },
+      // 初始化电子书
       initEpub () {
         const baseUrl = 'http://192.168.199.138:8081/epub/'
         // 拼接成完整的nginx地址
@@ -25,12 +44,34 @@
         this.book = new Epub(url)
         this.rendition = this.book.renderTo('read', {
           width: innerWidth,
-          height: innerHeight,
-          // 微信兼容性设置
-          method: 'default'
+          height: innerHeight
         })
         // 显示
         this.rendition.display()
+        // 绑定事件
+        this.rendition.on('touchstart', event => {
+          // 获取手指位置，用于之后计算手势
+          this.touchStartX = event.changedTouches[0].clientX
+          // 获取时间戳
+          this.touchStartTime = event.timeStamp
+        })
+        this.rendition.on('touchend', event => {
+          // 计算手势
+          const offsetX = event.changedTouches[0].clientX - this.touchStartX
+          // 计算手势停留时间
+          const time = event.timeStamp - this.touchStartTime
+          if (time < 500 && offsetX > 40) {
+            this.prevPage()
+          } else if (time < 500 && offsetX < -40) {
+            this.nextPage()
+          } else {
+            this.toggleTitleAndMenu()
+          }
+          // 禁止默认事件（在最新版本的chrome中不支持在这两个事件中使用这两个方法）
+          // event.preventDefault()
+          // event.stopPropagation()
+          // 通过加上第三个参数{ passive: false }实现相同效果
+        }, { passive: false })
       }
     },
     mounted () {
