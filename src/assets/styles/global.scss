@@ -1,7 +1,4 @@
+// global.scss 的主要功能是聚合
+
 @import './reset';
-
-$ratio: 375 / 10;
-
-@function px2rem($px) {
-  @return $px / $ratio + rem
-}
+@import './mixin';

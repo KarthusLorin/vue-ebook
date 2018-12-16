@@ -1,8 +1,6 @@
 <template>
   <div class="ebook-reader">
-    <div id="read">
-
-    </div>
+    <div id="read"></div>
   </div>
 </template>
 
@@ -14,7 +12,10 @@
 
   export default {
     computed: {
-      ...mapGetters(['fileName'])
+      ...mapGetters([
+        'fileName',
+        'menuVisible'
+      ])
     },
     methods: {
       // 上一页
@@ -33,7 +34,8 @@
       },
       // 显示标题菜单
       toggleTitleAndMenu () {
-
+        // 修改vuex中的是否显示菜单的值
+        this.$store.dispatch('setMenuVisible', !this.menuVisible)
       },
       // 初始化电子书
       initEpub () {
