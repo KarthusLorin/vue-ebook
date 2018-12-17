@@ -5,24 +5,21 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+  import { ebookMixin } from '../../utils/mixin'
   import Epub from 'epubjs'
 
   global.ePub = Epub
 
   export default {
-    computed: {
-      ...mapGetters([
-        'fileName',
-        'menuVisible'
-      ])
-    },
+    mixins: [ebookMixin],
     methods: {
       // 上一页
       prevPage () {
         if (this.rendition) {
           // 翻页
           this.rendition.prev()
+          // 隐藏菜单栏
+          this.hideTitleAndMenu()
         }
       },
       // 下一页
@@ -30,12 +27,20 @@
         if (this.rendition) {
           // 翻页
           this.rendition.next()
+          // 隐藏菜单栏
+          this.hideTitleAndMenu()
         }
       },
       // 显示标题菜单
       toggleTitleAndMenu () {
         // 修改vuex中的是否显示菜单的值
-        this.$store.dispatch('setMenuVisible', !this.menuVisible)
+        // this.$store.dispatch('setMenuVisible', !this.menuVisible)
+        this.setMenuVisible(!this.menuVisible)
+      },
+      // 隐藏标题菜单
+      hideTitleAndMenu () {
+        // this.$store.dispatch('setMenuVisible', false)
+        this.setMenuVisible(false)
       },
       // 初始化电子书
       initEpub () {
@@ -79,7 +84,10 @@
     mounted () {
       const fileName = this.$route.params.fileName.split('|').join('/')
       // 将电子书名称通过vuex进行保存
-      this.$store.dispatch('setFileName', fileName).then(() => {
+      // this.$store.dispatch('setFileName', fileName).then(() => {
+      //   this.initEpub()
+      // })
+      this.setFileName(fileName).then(() => {
         this.initEpub()
       })
     }
