@@ -34,6 +34,10 @@
       // 显示标题菜单
       toggleTitleAndMenu () {
         // 修改vuex中的是否显示菜单的值
+        if (this.menuVisible) {
+          // 隐藏设置
+          this.setSettingVisible(-1)
+        }
         // this.$store.dispatch('setMenuVisible', !this.menuVisible)
         this.setMenuVisible(!this.menuVisible)
       },
@@ -41,6 +45,8 @@
       hideTitleAndMenu () {
         // this.$store.dispatch('setMenuVisible', false)
         this.setMenuVisible(false)
+        // 同时隐藏设置
+        this.setSettingVisible(-1)
       },
       // 初始化电子书
       initEpub () {
