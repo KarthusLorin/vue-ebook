@@ -55,6 +55,8 @@
         const url = `${baseUrl}${this.fileName}.epub`
         // 实例化电子书
         this.book = new Epub(url)
+        // 将实例化的电子书对象放入vuex中
+        this.setCurrentBook(this.book)
         this.rendition = this.book.renderTo('read', {
           width: innerWidth,
           height: innerHeight
