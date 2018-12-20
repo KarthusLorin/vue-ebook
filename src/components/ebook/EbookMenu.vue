@@ -17,17 +17,20 @@
       </div>
     </transition>
     <EbookSettingFont></EbookSettingFont>
+    <EbookSettingFontPopup></EbookSettingFontPopup>
   </div>
 </template>
 
 <script>
   import EbookSettingFont from './EbookSettingFont'
+  import EbookSettingFontPopup from './EbookSettingFontPopUp'
   import { ebookMixin } from '../../utils/mixin'
 
   export default {
     mixins: [ebookMixin],
     components: {
-      EbookSettingFont
+      EbookSettingFont,
+      EbookSettingFontPopup
     },
     methods: {
       showSetting (key) {

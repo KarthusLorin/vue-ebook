@@ -49,7 +49,7 @@
       },
       // 显示字体修改弹出层
       showFontFamilyPopUp () {
-
+        this.setFontFamilyVisible(true)
       }
     }
   }
