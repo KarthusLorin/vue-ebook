@@ -37,6 +37,7 @@
         if (this.menuVisible) {
           // 隐藏设置
           this.setSettingVisible(-1)
+          this.setFontFamilyVisible(false)
         }
         // this.$store.dispatch('setMenuVisible', !this.menuVisible)
         this.setMenuVisible(!this.menuVisible)
@@ -47,6 +48,7 @@
         this.setMenuVisible(false)
         // 同时隐藏设置
         this.setSettingVisible(-1)
+        this.setFontFamilyVisible(false)
       },
       // 初始化电子书
       initEpub () {
@@ -87,6 +89,17 @@
           // event.stopPropagation()
           // 通过加上第三个参数{ passive: false }实现相同效果
         }, { passive: false })
+        // 添加字体资源
+        this.rendition.hooks.content.register(contents => {
+          Promise.all([
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/cabin.css`),
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`),
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`)
+          ]).then(() => {
+            console.log('字体加载完毕')
+          })
+        })
       }
     },
     mounted () {
