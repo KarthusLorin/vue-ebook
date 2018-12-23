@@ -91,7 +91,8 @@
         })
         // 显示
         this.rendition.display().then(() => {
-          this.initFontSize()
+          // 显示后和显示前初始化字体和大小效果一样，所以卸载显示后的promise中
+          this.initFontFamily()
           this.initFontFamily()
         })
         // 绑定事件
