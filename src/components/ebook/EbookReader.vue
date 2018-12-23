@@ -6,6 +6,12 @@
 
 <script>
   import { ebookMixin } from '../../utils/mixin'
+  import {
+    getFontFamily,
+    saveFontFamily,
+    getFontSize,
+    saveFontSize
+  } from '../../utils/localStorage'
   import Epub from 'epubjs'
 
   global.ePub = Epub
@@ -50,6 +56,26 @@
         this.setSettingVisible(-1)
         this.setFontFamilyVisible(false)
       },
+      // 获取字体大小离线缓存并设置字体大小
+      initFontSize () {
+        let fontSize = getFontSize(this.fileName)
+        if (!fontSize) {
+          saveFontSize(this.fileName, this.defaultFontSize)
+        } else {
+          this.rendition.themes.fontSize(fontSize)
+          this.setDefaultFontSize(fontSize)
+        }
+      },
+      // 获取字体离线缓存并设置字体
+      initFontFamily () {
+        let fontFamily = getFontFamily(this.fileName)
+        if (!fontFamily) {
+          saveFontFamily(this.fileName, this.defaultFontFamily)
+        } else {
+          this.rendition.themes.font(fontFamily)
+          this.setDefaultFontFamily(fontFamily)
+        }
+      },
       // 初始化电子书
       initEpub () {
         const baseUrl = 'http://192.168.199.138:8081/epub/'
@@ -64,7 +90,10 @@
           height: innerHeight
         })
         // 显示
-        this.rendition.display()
+        this.rendition.display().then(() => {
+          this.initFontSize()
+          this.initFontFamily()
+        })
         // 绑定事件
         this.rendition.on('touchstart', event => {
           // 获取手指位置，用于之后计算手势
