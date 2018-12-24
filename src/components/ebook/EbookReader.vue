@@ -10,7 +10,9 @@
     getFontFamily,
     saveFontFamily,
     getFontSize,
-    saveFontSize
+    saveFontSize,
+    getTheme,
+    saveTheme
   } from '../../utils/localStorage'
   import Epub from 'epubjs'
 
@@ -76,6 +78,24 @@
           this.setDefaultFontFamily(fontFamily)
         }
       },
+      // 获取主题离线缓存并设置主题
+      initTheme () {
+        // 获取离线主题
+        let defaultTheme = getTheme(this.fileName)
+        if (!defaultTheme) {
+          defaultTheme = this.themeList[0].name
+          // 离线存储主题
+          saveTheme(this.fileName, defaultTheme)
+        } else {
+          this.setDefaultTheme(defaultTheme)
+        }
+        this.themeList.forEach(theme => {
+          // 注册主题
+          this.rendition.themes.register(theme.name, theme.style)
+        })
+        // 设置离线主题
+        this.rendition.themes.select(this.defaultTheme)
+      },
       // 初始化电子书
       initEpub () {
         const baseUrl = 'http://192.168.199.138:8081/epub/'
@@ -92,7 +112,8 @@
         // 显示
         this.rendition.display().then(() => {
           // 显示后和显示前初始化字体和大小效果一样，所以卸载显示后的promise中
-          this.initFontFamily()
+          this.initTheme()
+          this.initFontSize()
           this.initFontFamily()
         })
         // 绑定事件
