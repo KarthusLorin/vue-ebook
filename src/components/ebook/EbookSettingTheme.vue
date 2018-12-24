@@ -25,6 +25,8 @@
         // 设置主题，由于commit是promise，所以使用promise
         this.setDefaultTheme(theme.name).then(() => {
           this.currentBook.rendition.themes.select(this.defaultTheme)
+          // 切换主题css
+          this.initGlobalStyle()
         })
         // 离线存储主题
         saveTheme(this.fileName, theme.name)

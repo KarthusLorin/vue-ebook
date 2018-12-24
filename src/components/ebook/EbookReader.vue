@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  import Epub from 'epubjs'
   import { ebookMixin } from '../../utils/mixin'
   import {
     getFontFamily,
@@ -14,7 +15,6 @@
     getTheme,
     saveTheme
   } from '../../utils/localStorage'
-  import Epub from 'epubjs'
 
   global.ePub = Epub
 
@@ -86,19 +86,18 @@
           defaultTheme = this.themeList[0].name
           // 离线存储主题
           saveTheme(this.fileName, defaultTheme)
-        } else {
-          this.setDefaultTheme(defaultTheme)
         }
+        this.setDefaultTheme(defaultTheme)
         this.themeList.forEach(theme => {
           // 注册主题
           this.rendition.themes.register(theme.name, theme.style)
         })
         // 设置离线主题
-        this.rendition.themes.select(this.defaultTheme)
+        this.rendition.themes.select(defaultTheme)
       },
       // 初始化电子书
       initEpub () {
-        const baseUrl = 'http://192.168.199.138:8081/epub/'
+        const baseUrl = `${process.env.VUE_APP_RES_URL}/epub/`
         // 拼接成完整的nginx地址
         const url = `${baseUrl}${this.fileName}.epub`
         // 实例化电子书
@@ -115,6 +114,7 @@
           this.initTheme()
           this.initFontSize()
           this.initFontFamily()
+          this.initGlobalStyle()
         })
         // 绑定事件
         this.rendition.on('touchstart', event => {
