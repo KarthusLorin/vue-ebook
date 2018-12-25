@@ -95,15 +95,8 @@
         // 设置离线主题
         this.rendition.themes.select(defaultTheme)
       },
-      // 初始化电子书
-      initEpub () {
-        const baseUrl = `${process.env.VUE_APP_RES_URL}/epub/`
-        // 拼接成完整的nginx地址
-        const url = `${baseUrl}${this.fileName}.epub`
-        // 实例化电子书
-        this.book = new Epub(url)
-        // 将实例化的电子书对象放入vuex中
-        this.setCurrentBook(this.book)
+      // 渲染初始化
+      initRendition () {
         this.rendition = this.book.renderTo('read', {
           width: innerWidth,
           height: innerHeight
@@ -116,6 +109,20 @@
           this.initFontFamily()
           this.initGlobalStyle()
         })
+        // 添加字体资源
+        this.rendition.hooks.content.register(contents => {
+          Promise.all([
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/cabin.css`),
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`),
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`)
+          ]).then(() => {
+            console.log('字体加载完毕')
+          })
+        })
+      },
+      // 初始化手势
+      initGesture () {
         // 绑定事件
         this.rendition.on('touchstart', event => {
           // 获取手指位置，用于之后计算手势
@@ -140,16 +147,26 @@
           // event.stopPropagation()
           // 通过加上第三个参数{ passive: false }实现相同效果
         }, { passive: false })
-        // 添加字体资源
-        this.rendition.hooks.content.register(contents => {
-          Promise.all([
-            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),
-            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/cabin.css`),
-            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`),
-            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`)
-          ]).then(() => {
-            console.log('字体加载完毕')
-          })
+      },
+      // 初始化电子书
+      initEpub () {
+        const baseUrl = `${process.env.VUE_APP_RES_URL}/epub/`
+        // 拼接成完整的nginx地址
+        const url = `${baseUrl}${this.fileName}.epub`
+        // 实例化电子书
+        this.book = new Epub(url)
+        // 将实例化的电子书对象放入vuex中
+        this.setCurrentBook(this.book)
+        // 渲染初始化
+        this.initRendition()
+        // 初始化手势
+        this.initGesture()
+        // 分页算法
+        this.book.ready.then(() => {
+          return this.book.locations.generate(750 * (window.innerWidth / 375) * (getFontSize(this.fileName) / 16))
+        }).then(locations => {
+          // 完成分页后，允许拖动
+          this.setBookAvailable(true)
         })
       }
     },
