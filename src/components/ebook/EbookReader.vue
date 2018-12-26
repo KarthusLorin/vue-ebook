@@ -164,7 +164,7 @@
         // 分页算法
         this.book.ready.then(() => {
           return this.book.locations.generate(750 * (window.innerWidth / 375) * (getFontSize(this.fileName) / 16))
-        }).then(locations => {
+        }).then(() => {
           // 完成分页后，允许拖动
           this.setBookAvailable(true)
         })

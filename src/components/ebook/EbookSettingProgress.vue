@@ -10,11 +10,13 @@
           <div class="progress-icon-wrapper">
             <span class="icon-back" @click="prevSection"></span>
           </div>
-          <input class="progress" type="range"
+          <input class="progress"
+                 type="range"
                  max="100"
                  min="0"
                  step="1"
-                 @change="onProgressChange($event.target.value)" @input="onProgressInput($event.target.value)"
+                 @change="onProgressChange($event.target.value)"
+                 @input="onProgressInput($event.target.value)"
                  :value="progress"
                  :disabled="!bookAvailable"
                  ref="progress">
@@ -36,12 +38,26 @@
   export default {
     mixins: [ebookMixin],
     methods: {
-      onProgressChange (process) {
+      onProgressChange (progress) {
+        this.setProgress(progress).then(() => {
+          // 展示progress
+          this.displayProgress()
+        })
       },
-      onProgressInput (process) {
+      onProgressInput (progress) {
+        // 拖动时，进度发生变化
+        this.setProgress(progress)
       },
-      prevSection () {},
-      nextSection () {}
+      displayProgress () {
+        // 获取定位
+        const cfi = this.currentBook.locations.cfiFromPercentage(this.progress / 100)
+        // 定位到所需的位置
+        this.currentBook.rendition.display(cfi)
+      },
+      prevSection () {
+      },
+      nextSection () {
+      }
     }
   }
 </script>
@@ -84,8 +100,6 @@
           width: 100%;
           -webkit-appearance: none;
           height: px2rem(2);
-          background: -webkit-linear-gradient(#999, #999) no-repeat, #ddd;
-          background-size: 0 100% !important;
           margin: 0 px2rem(10);
           &:focus {
             outline: none;
