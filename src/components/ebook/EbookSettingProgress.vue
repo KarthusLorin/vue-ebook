@@ -7,8 +7,8 @@
           <div class="icon-forward"></div>
         </div>
         <div class="progress-wrapper">
-          <div class="progress-icon-wrapper">
-            <span class="icon-back" @click="prevSection"></span>
+          <div class="progress-icon-wrapper" @click="prevSection">
+            <span class="icon-back"></span>
           </div>
           <input class="progress"
                  type="range"
@@ -20,8 +20,8 @@
                  :value="progress"
                  :disabled="!bookAvailable"
                  ref="progress">
-          <div class="progress-icon-wrapper">
-            <span class="icon-forward" @click="nextSection"></span>
+          <div class="progress-icon-wrapper" @click="nextSection">
+            <span class="icon-forward"></span>
           </div>
         </div>
         <div class="text-wrapper">
@@ -54,9 +54,30 @@
         // 定位到所需的位置
         this.currentBook.rendition.display(cfi)
       },
+      // 前一章节
       prevSection () {
+        if (this.section > 0 && this.bookAvailable) {
+          this.setSection(this.section - 1).then(() => {
+            // 跳转到上一章
+            this.displaySection()
+          })
+        }
       },
+      // 后一章节
       nextSection () {
+        if (this.section < this.currentBook.spine.length - 1 && this.bookAvailable) {
+          this.setSection(this.section + 1).then(() => {
+            // 跳转到下一章节
+            this.displaySection()
+          })
+        }
+      },
+      // 显示某一章节
+      displaySection () {
+        const sectionInfo = this.currentBook.section(this.section)
+        if (sectionInfo && sectionInfo.href) {
+          this.currentBook.rendition.display(sectionInfo.href)
+        }
       }
     }
   }
