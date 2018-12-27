@@ -1,5 +1,6 @@
 import { mapGetters, mapActions } from 'vuex'
 import { themeList, addCss, removeAllCss } from './book'
+import { saveLocation } from './localStorage'
 
 export const ebookMixin = {
   computed: {
@@ -71,6 +72,37 @@ export const ebookMixin = {
         default:
           addCss(`${process.env.VUE_APP_RES_URL}/theme/theme_default.css`)
           break
+      }
+    },
+    // 刷新进度条位置
+    refreshLocation () {
+      const currentLocation = this.currentBook.rendition.currentLocation()
+      const startCfi = currentLocation.start.cfi
+      // 获取进度
+      const progress = this.currentBook.locations.percentageFromCfi(startCfi)
+      // 设置进度
+      this.setProgress(Math.floor(progress * 100))
+      // 设置章节
+      this.setSection(currentLocation.start.index)
+      // 存储进度
+      saveLocation(this.fileName, startCfi)
+    },
+    // 封装display方法
+    display (target, cb) {
+      if (target) {
+        this.currentBook.rendition.display(target).then(() => {
+          this.refreshLocation()
+          if (cb) {
+            cb()
+          }
+        })
+      } else {
+        return this.currentBook.rendition.display().then(() => {
+          this.refreshLocation()
+          if (cb) {
+            cb()
+          }
+        })
       }
     }
   }

@@ -13,7 +13,8 @@
     getFontSize,
     saveFontSize,
     getTheme,
-    saveTheme
+    saveTheme,
+    getLocation
   } from '../../utils/localStorage'
 
   global.ePub = Epub
@@ -25,7 +26,9 @@
       prevPage () {
         if (this.rendition) {
           // 翻页
-          this.rendition.prev()
+          this.rendition.prev().then(() => {
+            this.refreshLocation()
+          })
           // 隐藏菜单栏
           this.hideTitleAndMenu()
         }
@@ -34,7 +37,9 @@
       nextPage () {
         if (this.rendition) {
           // 翻页
-          this.rendition.next()
+          this.rendition.next().then(() => {
+            this.refreshLocation()
+          })
           // 隐藏菜单栏
           this.hideTitleAndMenu()
         }
@@ -101,9 +106,11 @@
           width: innerWidth,
           height: innerHeight
         })
+        // 获取历史阅读位置，跳转
+        const location = getLocation(this.fileName)
         // 显示
-        this.rendition.display().then(() => {
-          // 显示后和显示前初始化字体和大小效果一样，所以卸载显示后的promise中
+        this.display(location, () => {
+          // 显示后和显示前初始化字体和大小效果一样，所以写在显示后的promise中
           this.initTheme()
           this.initFontSize()
           this.initFontFamily()
@@ -167,6 +174,8 @@
         }).then(() => {
           // 完成分页后，允许拖动
           this.setBookAvailable(true)
+          // 完成分页后，刷新位置信息
+          this.refreshLocation()
         })
       }
     },

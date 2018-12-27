@@ -3,7 +3,7 @@
     <div class="setting-wrapper" v-show="menuVisible && settingVisible === 2">
       <div class="setting-progress">
         <div class="read-time-wrapper">
-          <span class="read-time-text">1</span>
+          <span class="read-time-text">{{getReadTimeText()}}</span>
           <div class="icon-forward"></div>
         </div>
         <div class="progress-wrapper">
@@ -25,7 +25,8 @@
           </div>
         </div>
         <div class="text-wrapper">
-          <span>{{bookAvailable ? progress + '%' : '加载中...'}}</span>
+          <span class="progress-section-text">{{getSectionName}}</span>
+          <span>({{bookAvailable ? progress + '%' : '加载中...'}})</span>
         </div>
       </div>
     </div>
@@ -34,9 +35,21 @@
 
 <script>
   import { ebookMixin } from '../../utils/mixin'
+  import { getReadTime } from '../../utils/localStorage'
 
   export default {
     mixins: [ebookMixin],
+    computed: {
+      getSectionName () {
+        if (this.section) {
+          const sectionInfo = this.currentBook.section(this.section)
+          if (sectionInfo && sectionInfo.href) {
+            return this.currentBook.navigation.get(sectionInfo.href).label
+          }
+        }
+        return ''
+      }
+    },
     methods: {
       onProgressChange (progress) {
         this.setProgress(progress).then(() => {
@@ -49,10 +62,10 @@
         this.setProgress(progress)
       },
       displayProgress () {
-        // 获取定位
+        // 获取定位符
         const cfi = this.currentBook.locations.cfiFromPercentage(this.progress / 100)
         // 定位到所需的位置
-        this.currentBook.rendition.display(cfi)
+        this.display(cfi)
       },
       // 前一章节
       prevSection () {
@@ -76,7 +89,19 @@
       displaySection () {
         const sectionInfo = this.currentBook.section(this.section)
         if (sectionInfo && sectionInfo.href) {
-          this.currentBook.rendition.display(sectionInfo.href)
+          this.display(sectionInfo.href)
+        }
+      },
+      getReadTimeText () {
+        return this.$t('book.haveRead').replace('$1', this.getReadTimeByMinute(this.fileName))
+      },
+      getReadTimeByMinute () {
+        const readTime = getReadTime(this.fileName)
+        if (!readTime) {
+          return 0
+        } else {
+          // 不足一分钟，当做1分钟看
+          return Math.ceil(readTime / 60)
         }
       }
     }
@@ -143,7 +168,12 @@
         width: 100%;
         color: #333;
         font-size: px2rem(12);
-        text-align: center;
+        padding: 0 px2rem(15);
+        box-sizing: border-box;
+        @include center;
+        .progress-section-text {
+          @include ellipsis;
+        }
       }
     }
   }
