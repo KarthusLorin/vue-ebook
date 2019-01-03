@@ -55,14 +55,6 @@
         // this.$store.dispatch('setMenuVisible', !this.menuVisible)
         this.setMenuVisible(!this.menuVisible)
       },
-      // 隐藏标题菜单
-      hideTitleAndMenu () {
-        // this.$store.dispatch('setMenuVisible', false)
-        this.setMenuVisible(false)
-        // 同时隐藏设置
-        this.setSettingVisible(-1)
-        this.setFontFamilyVisible(false)
-      },
       // 获取字体大小离线缓存并设置字体大小
       initFontSize () {
         let fontSize = getFontSize(this.fileName)
